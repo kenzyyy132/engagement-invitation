@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 260">
+  <!-- Egyptian fanous: brass frame, sage and blush glass, warm inner glow. Hangs from (50, 0). -->
+  <defs>
+    <linearGradient id="brass" x1="0" x2="1">
+      <stop offset="0" stop-color="#8d6c36"/><stop offset=".45" stop-color="#e2c68a"/><stop offset="1" stop-color="#8d6c36"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".55" r=".6">
+      <stop offset="0" stop-color="#fff4d6"/><stop offset=".5" stop-color="#f6d9a0" stop-opacity=".85"/><stop offset="1" stop-color="#e8b980" stop-opacity=".4"/>
+    </radialGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffe6b0" stop-opacity=".55"/><stop offset="1" stop-color="#ffe6b0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="50" cy="140" r="50" fill="url(#halo)"/>
+  <path d="M50 0V58" stroke="#8d7550" stroke-width="1.4" stroke-dasharray="3 2"/>
+  <circle cx="50" cy="62" r="5" fill="none" stroke="url(#brass)" stroke-width="2.4"/>
+  <!-- cap -->
+  <path d="M50 66C38 72 30 82 28 92H72C70 82 62 72 50 66Z" fill="url(#brass)"/>
+  <path d="M34 86h32" stroke="#6e5328" stroke-width="1" opacity=".6"/>
+  <rect x="24" y="92" width="52" height="6" rx="1.5" fill="url(#brass)"/>
+  <!-- glass body -->
+  <path d="M27 98H73L80 150L73 196H27L20 150Z" fill="url(#glow)"/>
+  <path d="M27 98L20 150L27 196H38V98Z" fill="#7d9a80" fill-opacity=".45"/>
+  <path d="M62 98V196H73L80 150L73 98Z" fill="#7d9a80" fill-opacity=".45"/>
+  <path d="M38 98H62V196H38Z" fill="#f3b4c2" fill-opacity=".38"/>
+  <g transform="translate(50 147)" fill="none" stroke="#b8955a" stroke-width=".9">
+    <polygon points="0.0,-12.0 3.5,-8.5 8.5,-8.5 8.5,-3.5 12.0,0.0 8.5,3.5 8.5,8.5 3.5,8.5 0.0,12.0 -3.5,8.5 -8.5,8.5 -8.5,3.5 -12.0,0.0 -8.5,-3.5 -8.5,-8.5 -3.5,-8.5"/>
+  </g>
+  <path d="M27 98H73L80 150L73 196H27L20 150Z M38 98V196M62 98V196M20 150H80" fill="none" stroke="url(#brass)" stroke-width="2"/>
+  <path d="M30 112c4 8 4 16 0 24M70 112c-4 8-4 16 0 24M30 164c4 8 4 16 0 24M70 164c-4 8-4 16 0 24" fill="none" stroke="#b8955a" stroke-width=".8"/>
+  <!-- base and finial -->
+  <rect x="24" y="196" width="52" height="6" rx="1.5" fill="url(#brass)"/>
+  <path d="M30 202H70L58 222H42Z" fill="url(#brass)"/>
+  <path d="M42 222H58L50 240Z" fill="url(#brass)"/>
+  <circle cx="50" cy="246" r="4" fill="url(#brass)"/>
+  <circle cx="50" cy="256" r="2.4" fill="#b8955a"/>
+</svg>

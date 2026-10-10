@@ -1,0 +1,42 @@
+{
+  "width": 3875,
+  "height": 5462,
+  "layers": {
+    "bismillah": {
+      "left": 29.677,
+      "top": 19.224,
+      "width": 40.0,
+      "height": 7.049
+    },
+    "monogram": {
+      "left": 25.806,
+      "top": 26.364,
+      "width": 49.032,
+      "height": 29.385
+    },
+    "invite": {
+      "left": 24.258,
+      "top": 58.404,
+      "width": 52.129,
+      "height": 4.943
+    },
+    "arabic": {
+      "left": 38.71,
+      "top": 63.621,
+      "width": 23.226,
+      "height": 3.204
+    },
+    "november": {
+      "left": 41.29,
+      "top": 67.741,
+      "width": 18.581,
+      "height": 3.662
+    },
+    "date-row": {
+      "left": 19.871,
+      "top": 72.135,
+      "width": 60.645,
+      "height": 4.76
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <!-- Frame corner (top-left orientation; mirror with CSS for the others) -->
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="160">
+      <stop offset="0" stop-color="#cfae6c"/><stop offset=".5" stop-color="#e6cf98"/><stop offset="1" stop-color="#a98545"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#g)" stroke-linecap="round">
+    <path d="M14 160V40Q14 14 40 14H160" stroke-width="2.2"/>
+    <path d="M24 160V48Q24 24 48 24H160" stroke-width=".9"/>
+    <path d="M36 70C36 50 50 36 70 36M36 70c0 10 6 16 14 16M70 36c10 0 16 6 16 14" stroke-width="1.1"/>
+    <path d="M50 92c-10 6-14 18-10 30M92 50c6-10 18-14 30-10" stroke-width="1"/>
+    <path d="M44 128c4 4 4 10 0 14M128 44c4 4 10 4 14 0" stroke-width="1"/>
+  </g>
+  <g transform="translate(38 38)">
+    <polygon points="0.0,-12.0 3.5,-8.5 8.5,-8.5 8.5,-3.5 12.0,0.0 8.5,3.5 8.5,8.5 3.5,8.5 0.0,12.0 -3.5,8.5 -8.5,8.5 -8.5,3.5 -12.0,0.0 -8.5,-3.5 -8.5,-8.5 -3.5,-8.5" fill="#f6efe0" stroke="url(#g)" stroke-width="1.4"/>
+    <polygon points="0.0,-7.0 2.1,-5.0 4.9,-4.9 5.0,-2.1 7.0,0.0 5.0,2.1 4.9,4.9 2.1,5.0 0.0,7.0 -2.1,5.0 -4.9,4.9 -5.0,2.1 -7.0,0.0 -5.0,-2.1 -4.9,-4.9 -2.1,-5.0" fill="#e9a3b4" fill-opacity=".55" stroke="url(#g)" stroke-width=".8"/>
+    <circle r="1.8" fill="#b8955a"/>
+  </g>
+  <g fill="#cfae6c">
+    <circle cx="14" cy="100" r="2.2"/><circle cx="100" cy="14" r="2.2"/>
+    <circle cx="14" cy="134" r="1.4"/><circle cx="134" cy="14" r="1.4"/>
+  </g>
+</svg>

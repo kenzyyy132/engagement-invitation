@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60">
+  <!-- Section divider: gold lines meeting at a star, with leaf flourishes and a blossom -->
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="360" y2="0">
+      <stop offset="0" stop-color="#cfae6c" stop-opacity="0"/><stop offset=".3" stop-color="#c9a764"/><stop offset=".5" stop-color="#e6cf98"/><stop offset=".7" stop-color="#c9a764"/><stop offset="1" stop-color="#cfae6c" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lf" x1="0" x2="1"><stop offset="0" stop-color="#5f765f"/><stop offset="1" stop-color="#b9c8b2"/></linearGradient>
+    <path id="leaf" d="M0 0C8-7 20-7 28 0C20 7 8 7 0 0Z" fill="url(#lf)"/>
+  </defs>
+  <path d="M10 30H150M210 30H350" stroke="url(#g)" stroke-width="1.2"/>
+  <path d="M60 36H150M210 36H300" stroke="url(#g)" stroke-width=".6"/>
+  <use href="#leaf" transform="translate(150 30) rotate(200) scale(.9)"/>
+  <use href="#leaf" transform="translate(150 30) rotate(160) scale(.75)"/>
+  <use href="#leaf" transform="translate(210 30) rotate(-20) scale(.9)"/>
+  <use href="#leaf" transform="translate(210 30) rotate(20) scale(.75)"/>
+  <g transform="translate(180 30)">
+    <polygon points="0.0,-20.0 5.9,-14.1 14.1,-14.1 14.1,-5.9 20.0,0.0 14.1,5.9 14.1,14.1 5.9,14.1 0.0,20.0 -5.9,14.1 -14.1,14.1 -14.1,5.9 -20.0,0.0 -14.1,-5.9 -14.1,-14.1 -5.9,-14.1" fill="#f7f1e4" stroke="#c9a764" stroke-width="1.3"/>
+    <g fill="#f0a9b9">
+      <path d="M0 0C-4-3-5-9 0-12C5-9 4-3 0 0Z"/><path d="M0 0C-4-3-5-9 0-12C5-9 4-3 0 0Z" transform="rotate(72)"/><path d="M0 0C-4-3-5-9 0-12C5-9 4-3 0 0Z" transform="rotate(144)"/><path d="M0 0C-4-3-5-9 0-12C5-9 4-3 0 0Z" transform="rotate(216)"/><path d="M0 0C-4-3-5-9 0-12C5-9 4-3 0 0Z" transform="rotate(288)"/>
+    </g>
+    <circle r="3" fill="#d9b46a"/>
+  </g>
+  <g fill="#c9a764"><circle cx="100" cy="30" r="2"/><circle cx="260" cy="30" r="2"/></g>
+</svg>
