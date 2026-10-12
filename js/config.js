@@ -19,8 +19,8 @@ window.INVITATION_CONFIG = {
   event: {
     title: "Engagement Celebration",
     // Local date and time of the event, exactly as printed on the invitation:
-    // Thursday, 5 November 2026 at 7:00 PM.
-    start: "2026-11-05T19:00",
+    // Thursday, 5 November 2026 at 6:00 PM.
+    start: "2026-11-05T18:00",
     durationHours: 4, // TODO: used for calendar entries and the "thank you" state
 
     // IANA time zone of the venue. The countdown, calendar entries and the

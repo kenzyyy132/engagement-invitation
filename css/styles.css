@@ -671,18 +671,20 @@ button { font: inherit; }
 .arch__actions { display: grid; justify-items: center; gap: .7rem; }
 .arch__deadline { font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; opacity: .8; }
 
+/* Placed exactly where they sit on the card (arch = 2880 artwork px wide,
+   dome top at y 406), so the foliage meets the arch's sides and dome as printed. */
 .arch-scene__garland {
   position: absolute; z-index: 1;
-  width: 18%; height: auto;
+  height: auto;
   pointer-events: none;
-  transform-origin: 50% 100%;
 }
-.arch-scene__garland--left  { right: calc(100% - 2px); bottom: 30%; }
-.arch-scene__garland--right { left: calc(100% - 2px); bottom: 24%; }
+.arch-scene__garland--left  { width: 26.389%; left: -17.257%; top: calc(var(--aw) * .3903); transform-origin: 68% 100%; }
+.arch-scene__garland--right { width: 26.910%; left: 90.382%;  top: calc(var(--aw) * .1264); transform-origin: 36% 100%; }
 .arch-scene.is-visible .arch-scene__garland--left  { animation: sway-l 9s ease-in-out 1.2s infinite; }
 .arch-scene.is-visible .arch-scene__garland--right { animation: sway-r 10s ease-in-out 1.2s infinite; }
-@keyframes sway-l { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-1.1deg); } }
-@keyframes sway-r { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(1.1deg); } }
+/* gentle: the inner edge meets the arch, so a big sway would open a gap */
+@keyframes sway-l { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-.5deg); } }
+@keyframes sway-r { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(.5deg); } }
 
 /* ───────────────────────────────────────────────────────────────
    3. Details

@@ -22,6 +22,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "assets", "source", "invitation-original.png")
 OUT = os.path.join(ROOT, "assets", "card")
 ARCH_BGR = np.array([89, 106, 87], dtype=np.float32)  # #576A59
+ARCH_SIDES = (497, 3377)  # x of the arch's straight sides, in artwork pixels
+ARCH_TOP = 406            # y of the top of the dome
 
 # Boxes in original-artwork pixels: (x0, y0, x1, y1)
 LAYERS = {
@@ -76,6 +78,87 @@ def fg_colour(crop):
     px = crop.reshape(-1, 3).astype(np.float32)
     lum = px.sum(1)
     return px[lum >= np.percentile(lum, 98)].mean(0)
+
+
+def arch_inset(xs, ys):
+    """Signed distance (px) inside the card's arch: >0 inside, <0 outside."""
+    x0, x1, top = ARCH_SIDES[0], ARCH_SIDES[1], ARCH_TOP
+    r = (x1 - x0) / 2
+    cx, cy = (x0 + x1) / 2, top + r
+    sides = np.minimum(xs - x0, x1 - xs)
+    dome = r - np.hypot(xs - cx, ys - cy)
+    return np.where(ys >= cy, sides, np.minimum(dome, sides))
+
+
+def garland_cutout(art, box):
+    """BGRA cut-out of the florals in `box`, free of the stone background, the arch and its hairline."""
+    x0, y0, x1, y1 = box
+    crop = art[y0:y1, x0:x1]
+    h, w = crop.shape[:2]
+    ys, xs = np.mgrid[y0:y1, x0:x1].astype(np.float32)
+    inset = arch_inset(xs, ys)
+    inside = inset > 0
+
+    lab = cv2.GaussianBlur(cv2.cvtColor(crop, cv2.COLOR_BGR2LAB).astype(np.float32), (0, 0), 2)
+    L = lab[..., 0]
+    chroma = np.hypot(lab[..., 1] - 128, lab[..., 2] - 128)
+    # stone background: its median colour and the darker colour of its swirl lines
+    ref = cv2.cvtColor(art[0:370, 1400:2400], cv2.COLOR_BGR2LAB).reshape(-1, 3).astype(np.float32)
+    bg = np.median(ref, 0)
+    line = ref[ref[:, 0] <= np.percentile(ref[:, 0], 1)].mean(0)
+    v = line - bg
+    t = np.clip(((lab - bg) @ v) / (v @ v), 0, 1.6)
+    d_bg = np.linalg.norm(lab - (bg + t[..., None] * v), axis=2)
+    d_arch = np.abs(crop.astype(np.float32) - ARCH_BGR).sum(2)
+    hairline = inside & (inset > 110) & (inset < 152) & (L > 195) & (chroma < 14)
+    # the card's pale strip just outside the arch edge
+    edge_strip = ~inside & (inset > -45) & (chroma < 9) & (L > 165) & (L < 222)
+
+    seed = np.where(inside, (d_arch > 40) & ~hairline, (d_bg > 13) | (L > 229.5)) & ~edge_strip
+    seed = cv2.morphologyEx(seed.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((9, 9), np.uint8))
+    seed = cv2.morphologyEx(seed, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+    seed = keep_large(seed, 3000, fill_below=60000)
+
+    # GrabCut refines the colour-key seed (keeps whole petals whose shading nears the background)
+    gc = np.where(seed > 0, cv2.GC_PR_FGD, cv2.GC_PR_BGD).astype(np.uint8)
+    gc[np.where(inside, d_arch > 90, (d_bg > 28) | (L > 236))] = cv2.GC_FGD
+    far = cv2.distanceTransform((1 - seed).astype(np.uint8), cv2.DIST_L2, 5) > 30
+    gc[np.where(inside, d_arch < 12, far & (d_bg < 7) & (L < 227)) | hairline | edge_strip] = cv2.GC_BGD
+    small = cv2.resize(crop, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+    gc_s = cv2.resize(gc, (small.shape[1], small.shape[0]), interpolation=cv2.INTER_NEAREST)
+    cv2.grabCut(small, gc_s, None, np.zeros((1, 65)), np.zeros((1, 65)), 6, cv2.GC_INIT_WITH_MASK)
+    keep = cv2.resize(np.isin(gc_s, (cv2.GC_FGD, cv2.GC_PR_FGD)).astype(np.uint8), (w, h), interpolation=cv2.INTER_LINEAR)
+    keep[hairline | edge_strip | (inside & (d_arch < 12))] = 0
+    keep = cv2.morphologyEx(keep, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+    keep = keep_large(keep, 3000, fill_below=8000)
+
+    alpha = cv2.GaussianBlur(keep.astype(np.float32), (0, 0), 1.6)
+    alpha = np.clip((alpha - 0.15) / 0.85, 0, 1)
+    fy = np.clip(np.minimum(np.arange(h), h - 1 - np.arange(h)) / (0.06 * h), 0, 1)
+    alpha *= (fy * fy * (3 - 2 * fy))[:, None]  # stems fade out at the ends instead of stopping dead
+
+    # un-mix the edge pixels from whatever they were blended with (arch or stone)
+    stone = cv2.cvtColor(np.uint8([[bg]]), cv2.COLOR_LAB2BGR)[0, 0].astype(np.float32)
+    under = np.where(inside[..., None], ARCH_BGR, stone)
+    a = np.clip(alpha, 0.15, 1)[..., None]
+    fg = np.where(alpha[..., None] < 0.98, (crop - under * (1 - a)) / a, crop)
+    return np.dstack([np.clip(fg, 0, 255), alpha * 255]).astype(np.uint8)
+
+
+def keep_large(mask, min_area, fill_below):
+    """Drop specks smaller than min_area; fill enclosed holes smaller than fill_below."""
+    n, lbl, st, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+    out = np.zeros_like(mask)
+    for i in range(1, n):
+        if st[i, 4] >= min_area:
+            out[lbl == i] = 1
+    h, w = out.shape
+    n, lbl, st, _ = cv2.connectedComponentsWithStats((1 - out).astype(np.uint8), connectivity=4)
+    for i in range(1, n):
+        x, y, bw, bh, area = st[i]
+        if area < fill_below and x > 0 and y > 0 and x + bw < w and y + bh < h:
+            out[lbl == i] = 1
+    return out
 
 
 def scaled(img, scale):
@@ -148,20 +231,18 @@ def main():
     tile = np.vstack([row, row[::-1]])
     cv2.imwrite(os.path.join(ROOT, "assets", "pattern.webp"), scaled(tile, 0.4), [cv2.IMWRITE_WEBP_QUALITY, 80])
 
-    # Garlands: the florals growing along the arch's left and right edges.
-    # Their inner edge is the arch edge, so on the site they sit flush against arch panels.
-    for name, (x0, y0, x1, y1), inner in (
-        ("garland-left", (0, 1530, 494, 4420), "right"),
-        ("garland-right", (3374, 770, 3875, 4530), "left"),
+    # Garlands: the florals growing along the arch's left and right edges, cut out
+    # from the card's stone background (and from the arch itself) so only the
+    # leaves and blossoms remain. "-arch" variants keep the foliage that spills
+    # over the arch, for the message arch where they overlap its sides as on the card.
+    for name, box in (
+        ("garland-left", (0, 1530, 494, 4420)),
+        ("garland-right", (3374, 770, 3875, 4530)),
+        ("garland-left-arch", (0, 1530, 760, 4420)),
+        ("garland-right-arch", (3100, 770, 3875, 4530)),
     ):
-        crop = art[y0:y1, x0:x1]
-        h, w = crop.shape[:2]
-        fy = np.clip(np.minimum(np.arange(h), h - 1 - np.arange(h)) / (0.12 * h), 0, 1)
-        dx = np.arange(w) if inner == "right" else (w - 1 - np.arange(w))
-        fx = np.clip(dx / (0.35 * w), 0, 1)  # fade toward the outer (page) edge only
-        alpha = (np.outer(fy * fy * (3 - 2 * fy), fx * fx * (3 - 2 * fx)) * 255).astype(np.uint8)
-        rgba = np.dstack([crop, alpha])
-        cv2.imwrite(os.path.join(OUT, f"{name}.webp"), scaled(rgba, 0.32), [cv2.IMWRITE_WEBP_QUALITY, 84])
+        rgba = garland_cutout(art, box)
+        cv2.imwrite(os.path.join(OUT, f"{name}.webp"), scaled(rgba, 0.32), [cv2.IMWRITE_WEBP_QUALITY, 90])
 
     with open(os.path.join(OUT, "layers.json"), "w") as f:
         json.dump(meta, f, indent=2)
